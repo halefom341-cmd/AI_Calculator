@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#f6f7f2">
+    <meta name="description" content="A precise calculator for math, analysis, and everyday questions.">
+    <title>AI Calculator</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="history-pane" id="history-pane" aria-label="Recent calculations">
+        <a class="brand" href="./" aria-label="AI Calculator home">
+          <span class="brand-mark" aria-hidden="true">∑</span>
+          <span>AI <strong>CALCULATOR</strong></span>
+        </a>
+        <button class="new-solve" id="new-solve" type="button"><span aria-hidden="true">+</span> New question</button>
+        <div class="history-heading">RECENT <span class="local-indicator"><i></i> LOCAL</span></div>
+        <div class="history-list" id="history-list"><p class="empty-history">Your solved questions will appear here.</p></div>
+        <div class="sidebar-foot"><span class="keycap">⌘</span><span class="keycap">↵</span><span>to solve</span></div>
+      </aside>
+
+      <main class="main-pane">
+        <header class="topbar">
+          <button class="icon-button mobile-history" id="history-toggle" type="button" aria-label="Show recent questions" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div class="mobile-brand"><span class="brand-mark" aria-hidden="true">∑</span> AI CALCULATOR</div>
+          <div class="topbar-spacer"></div>
+          <span class="engine-status"><span class="status-dot"></span><span id="engine-status-text">LOCAL ENGINE READY</span></span>
+          <span class="version-label">v1.0</span>
+        </header>
+
+        <section class="workspace" aria-labelledby="page-title">
+          <div class="intro">
+            <div class="eyebrow"><span></span> MATH, LOGIC &amp; ANALYSIS</div>
+            <h1 id="page-title">What are we<br class="desktop-break"> working out?</h1>
+            <p>From a quick calculation to a question worth thinking through.</p>
+          </div>
+
+          <section class="answer-panel" id="answer-panel" aria-live="polite" hidden>
+            <div class="answer-topline">
+              <span class="answer-kicker"><span class="answer-check" aria-hidden="true">✓</span> ANSWER</span>
+              <button class="icon-button copy-button" id="copy-answer" type="button" aria-label="Copy answer" title="Copy answer">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>
+              </button>
+            </div>
+            <div class="answer-question" id="answer-question"></div>
+            <div class="answer-content" id="answer-content"></div>
+            <div class="answer-source" id="answer-source"></div>
+          </section>
+
+          <div class="suggestions" id="suggestions" aria-label="Example questions">
+            <button type="button" class="suggestion" data-question="Solve 2x + 5 = 17">
+              <span class="suggestion-icon mint" aria-hidden="true">x</span>
+              <span><strong>Solve an equation</strong><small>2x + 5 = 17</small></span><span class="suggestion-arrow" aria-hidden="true">↗</span>
+            </button>
+            <button type="button" class="suggestion" data-question="What is the average of 18, 24, 31, 27, and 40?">
+              <span class="suggestion-icon coral" aria-hidden="true">μ</span>
+              <span><strong>Find an average</strong><small>18, 24, 31, 27, 40</small></span><span class="suggestion-arrow" aria-hidden="true">↗</span>
+            </button>
+            <button type="button" class="suggestion" data-question="If I invest $2,400 at 5% annual interest for 6 years, compounded yearly, what will it grow to?">
+              <span class="suggestion-icon yellow" aria-hidden="true">↗</span>
+              <span><strong>Explore a problem</strong><small>Compound interest</small></span><span class="suggestion-arrow" aria-hidden="true">↗</span>
+            </button>
+          </div>
+
+          <form class="composer" id="question-form">
+            <label class="visually-hidden" for="question-input">Enter a math or reasoning question</label>
+            <textarea id="question-input" name="question" rows="1" maxlength="4000" placeholder="Ask anything or enter an equation..." required></textarea>
+            <div class="composer-footer">
+              <div class="composer-note"><span class="bolt" aria-hidden="true">ϟ</span> Exact math runs on your device</div>
+              <div class="composer-actions"><span class="enter-hint">ENTER TO SOLVE</span>
+                <button class="submit-button" id="submit-button" type="submit" aria-label="Solve question">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            </div>
+          </form>
+          <p class="privacy-note">For general reasoning, answers are generated by the connected AI service.</p>
+        </section>
+        <footer class="app-footer"><span>BUILT FOR CLEAR THINKING</span><span>FAST BY DESIGN <i>•</i> PRIVATE BY DEFAULT</span></footer>
+      </main>
+    </div>
+    <script src="solver.js?v=3"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
