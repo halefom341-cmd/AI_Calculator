@@ -151,6 +151,76 @@
     return { value: display, explanation: `${label} of ${values.map(formatNumber).join(", ")} = ${display}`, numeric: true };
   }
 
+  function unitConversion(input) {
+    const match = input.match(/\bconvert\s+(-?\d+(?:\.\d+)?)\s+(.+?)\s+(?:to|into)\s+([a-z°]+(?:\s+[a-z]+)?)\s*$/i);
+    if (!match) return null;
+    const units = {
+      m: ["length", 1, "m"], meter: ["length", 1, "m"], meters: ["length", 1, "m"], metre: ["length", 1, "m"], metres: ["length", 1, "m"],
+      km: ["length", 1000, "km"], kilometer: ["length", 1000, "km"], kilometers: ["length", 1000, "km"], kilometre: ["length", 1000, "km"], kilometres: ["length", 1000, "km"],
+      cm: ["length", 0.01, "cm"], centimeter: ["length", 0.01, "cm"], centimeters: ["length", 0.01, "cm"], centimetre: ["length", 0.01, "cm"], centimetres: ["length", 0.01, "cm"],
+      mm: ["length", 0.001, "mm"], millimeter: ["length", 0.001, "mm"], millimeters: ["length", 0.001, "mm"], millimetre: ["length", 0.001, "mm"], millimetres: ["length", 0.001, "mm"],
+      mi: ["length", 1609.344, "mi"], mile: ["length", 1609.344, "mi"], miles: ["length", 1609.344, "mi"],
+      ft: ["length", 0.3048, "ft"], foot: ["length", 0.3048, "ft"], feet: ["length", 0.3048, "ft"],
+      in: ["length", 0.0254, "in"], inch: ["length", 0.0254, "in"], inches: ["length", 0.0254, "in"],
+      kg: ["mass", 1, "kg"], kilogram: ["mass", 1, "kg"], kilograms: ["mass", 1, "kg"],
+      g: ["mass", 0.001, "g"], gram: ["mass", 0.001, "g"], grams: ["mass", 0.001, "g"],
+      mg: ["mass", 0.000001, "mg"], milligram: ["mass", 0.000001, "mg"], milligrams: ["mass", 0.000001, "mg"],
+      lb: ["mass", 0.45359237, "lb"], lbs: ["mass", 0.45359237, "lb"], pound: ["mass", 0.45359237, "lb"], pounds: ["mass", 0.45359237, "lb"],
+      oz: ["mass", 0.028349523125, "oz"], ounce: ["mass", 0.028349523125, "oz"], ounces: ["mass", 0.028349523125, "oz"],
+      s: ["time", 1, "s"], sec: ["time", 1, "s"], second: ["time", 1, "s"], seconds: ["time", 1, "s"],
+      min: ["time", 60, "min"], minute: ["time", 60, "min"], minutes: ["time", 60, "min"],
+      h: ["time", 3600, "h"], hr: ["time", 3600, "h"], hour: ["time", 3600, "h"], hours: ["time", 3600, "h"],
+      day: ["time", 86400, "day"], days: ["time", 86400, "day"],
+      c: ["temperature", 1, "°C", 273.15], "°c": ["temperature", 1, "°C", 273.15], celsius: ["temperature", 1, "°C", 273.15], "degrees celsius": ["temperature", 1, "°C", 273.15],
+      f: ["temperature", 5 / 9, "°F", 255.3722222222222], "°f": ["temperature", 5 / 9, "°F", 255.3722222222222], fahrenheit: ["temperature", 5 / 9, "°F", 255.3722222222222], "degrees fahrenheit": ["temperature", 5 / 9, "°F", 255.3722222222222],
+      k: ["temperature", 1, "K", 0], kelvin: ["temperature", 1, "K", 0], kelvins: ["temperature", 1, "K", 0],
+      l: ["volume", 1, "L"], liter: ["volume", 1, "L"], liters: ["volume", 1, "L"], litre: ["volume", 1, "L"], litres: ["volume", 1, "L"],
+      ml: ["volume", 0.001, "mL"], milliliter: ["volume", 0.001, "mL"], milliliters: ["volume", 0.001, "mL"], millilitre: ["volume", 0.001, "mL"], millilitres: ["volume", 0.001, "mL"],
+      gal: ["volume", 3.785411784, "gal"], gallon: ["volume", 3.785411784, "gal"], gallons: ["volume", 3.785411784, "gal"],
+    };
+    const from = units[match[2].trim().toLowerCase()];
+    const to = units[match[3].trim().toLowerCase()];
+    const value = Number(match[1]);
+    if (!from || !to || from[0] !== to[0] || !Number.isFinite(value)) return null;
+    const baseValue = value * from[1] + (from[3] || 0);
+    const converted = (baseValue - (to[3] || 0)) / to[1];
+    if (!Number.isFinite(converted)) return null;
+    const result = formatNumber(converted);
+    return {
+      value: `${result} ${to[2]}`,
+      explanation: `${formatNumber(value)} ${from[2]} = ${result} ${to[2]}`,
+      numeric: true,
+    };
+  }
+
+  function binomialProbability(input) {
+    const match = input.match(/(?:probability\s+of\s+)?(?:exactly\s+)?(\d+)\s+success(?:es)?\s+in\s+(\d+)\s+trials?\s+(?:with\s+)?(?:success\s+)?probability\s+(?:of\s+)?(\d+(?:\.\d+)?%?)/i);
+    if (!match) return null;
+    const successes = Number(match[1]);
+    const trials = Number(match[2]);
+    const probability = Number(match[3].replace("%", "")) / (match[3].includes("%") ? 100 : 1);
+    if (successes > trials || trials > 10000 || probability < 0 || probability > 1) return null;
+    let result;
+    if (probability === 0) result = successes === 0 ? 1 : 0;
+    else if (probability === 1) result = successes === trials ? 1 : 0;
+    else {
+      const smallerCount = Math.min(successes, trials - successes);
+      let logCombination = 0;
+      for (let index = 1; index <= smallerCount; index += 1) {
+        logCombination += Math.log(trials - smallerCount + index) - Math.log(index);
+      }
+      result = Math.exp(logCombination + successes * Math.log(probability) + (trials - successes) * Math.log1p(-probability));
+    }
+    if (!Number.isFinite(result)) return null;
+    const percentage = formatNumber(result * 100);
+    const display = formatNumber(result);
+    return {
+      value: display,
+      explanation: `P(X = ${successes}) for ${trials} independent trials with p = ${formatNumber(probability)} is ${display} (${percentage}%).`,
+      numeric: true,
+    };
+  }
+
   function compoundInterest(input) {
     if (!/\bcompound(?:ed|ing)?\b/i.test(input)) return null;
     const match = input.match(/\$?([\d,]+(?:\.\d+)?)\s+(?:at\s+)?([\d.]+)\s*%\s*(?:annual(?:ly)?\s*)?(?:interest\s*)?(?:for\s*)([\d.]+)\s*years?\b/i);
@@ -226,6 +296,10 @@
     if (summary) return summary;
     const interest = compoundInterest(input);
     if (interest) return interest;
+    const conversion = unitConversion(input);
+    if (conversion) return conversion;
+    const probability = binomialProbability(input);
+    if (probability) return probability;
     const elevation = elevationProblem(input);
     if (elevation) return elevation;
     try {
@@ -234,12 +308,30 @@
       if (equation.includes("=") && equation.split("=").length === 2 && /x/i.test(equation) && /^[0-9xpi e.+*/^()%=-]+$/i.test(equation)) {
         const [left, right] = equation.split("=");
         const difference = (value) => evaluate(left, value) - evaluate(right, value);
-        const intercept = difference(0);
-        const slope = difference(1) - intercept;
-        const tolerance = 1e-9 * Math.max(1, Math.abs(intercept), Math.abs(slope));
-        if (Math.abs(difference(2) - (intercept + 2 * slope)) > tolerance || Math.abs(slope) < 1e-14) return null;
-        const result = formatNumber(-intercept / slope);
-        return { value: `x = ${result}`, explanation: `Solving ${left} = ${right} gives x = ${result}`, numeric: true };
+        const constant = difference(0);
+        const atOne = difference(1);
+        const atMinusOne = difference(-1);
+        const quadratic = (atOne + atMinusOne - 2 * constant) / 2;
+        const linear = (atOne - atMinusOne) / 2;
+        const tolerance = 1e-9 * Math.max(1, Math.abs(constant), Math.abs(linear), Math.abs(quadratic));
+        if (Math.abs(difference(2) - (4 * quadratic + 2 * linear + constant)) > tolerance) return null;
+        if (Math.abs(quadratic) < 1e-14) {
+          if (Math.abs(linear) < 1e-14) return null;
+          const result = formatNumber(-constant / linear);
+          return { value: `x = ${result}`, explanation: `Solving ${left} = ${right} gives x = ${result}`, numeric: true };
+        }
+        const discriminant = linear * linear - 4 * quadratic * constant;
+        if (discriminant < -tolerance) return null;
+        const root = Math.sqrt(Math.max(0, discriminant));
+        const roots = root < 1e-14
+          ? [-linear / (2 * quadratic)]
+          : [(-linear - root) / (2 * quadratic), (-linear + root) / (2 * quadratic)];
+        const formattedRoots = roots.map(formatNumber);
+        return {
+          value: `x = ${formattedRoots.join(", ")}`,
+          explanation: `Solving ${left} = ${right} gives ${formattedRoots.length === 1 ? `a repeated root x = ${formattedRoots[0]}` : `roots x = ${formattedRoots.join(" and x = ")}`}`,
+          numeric: true,
+        };
       }
       const expression = normalize(input).replace(/π/g, "pi");
       if (!expression || !/^[0-9a-z().+*/^%,-]+$/i.test(expression)) return null;

@@ -23,7 +23,10 @@ module.exports = async function solve(req, res) {
         model: process.env.OPENAI_MODEL || "gpt-4o-mini",
         temperature: 0.1,
         messages: [
-          { role: "system", content: "You are a careful math and reasoning assistant. Answer accurately and concisely. For calculations, verify the result and include essential steps. State assumptions when needed; never invent missing information or claim certainty when a question is ambiguous. Format equations in plain text." },
+          {
+            role: "system",
+            content: "You are a careful mathematics, science, and analytical-reasoning assistant. Help across arithmetic, algebra, functions, calculus, trigonometry, geometry, statistics, probability, linear algebra, unit conversion, and dimensional analysis. Parse the user's natural-language request, identify the quantities and constraints, and ask a concise clarifying question when essential information is missing or ambiguous. For numerical work, show the method, substitutions, units, and appropriate rounding; check the result independently when practical. Distinguish exact symbolic results from numerical approximations, state assumptions and limitations, and never invent data or claim to have executed code. Explain reasoning in clear, ordered steps when useful. Format equations in plain text."
+          },
           { role: "user", content: question },
         ],
       }),
